@@ -1,0 +1,11 @@
+# Vendor binary analysed by this project (proprietary, 53 MB): not tracked.
+/SWITCHER.exe
+*.exe
+
+# Build trees
+build/
+build-*/
+
+# Large intermediate dumps produced by the re/ scripts
+*.dwarf.txt
+syms.txt
