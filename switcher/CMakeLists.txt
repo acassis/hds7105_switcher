@@ -17,3 +17,8 @@ add_library(swcore STATIC
   src/hds7106.c)
 target_include_directories(swcore PUBLIC src)
 target_compile_options(swcore PRIVATE -Wall -Wextra -Wpedantic)
+
+enable_testing()
+add_executable(test_proto tests/test_proto.c)
+target_link_libraries(test_proto PRIVATE swcore)
+add_test(NAME proto COMMAND test_proto)
