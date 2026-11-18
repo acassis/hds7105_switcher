@@ -2,6 +2,10 @@
 /SWITCHER.exe
 *.exe
 
+# DeviceWell "Time synchronization" download (vendor tool + PDF): not tracked
+/Time Synchronization Software/
+/Time Synchronization Software.zip
+
 # Build trees
 build/
 build-*/
