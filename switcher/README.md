@@ -120,7 +120,8 @@ tests/e2e.sh 7106           # same for the HDS7106 (T-bar, PIP/POP, IP dialog)
   module, written from PROTOCOL.md independently of the C code. It answers
   discovery, state (0x49), IP-info (0x24) and URL (0x6A) requests, applies
   commands to its state, and can record every frame it receives
-  (`--record`).
+  (`--record`). It decodes time-sync frames and checks the BCD date and
+  time against its own clock (`SW FF @time` in an `.expect` file).
 * **How e2e.sh runs**: it starts the simulator on 127.0.0.2/127.0.0.3. It
   then runs the app in a hidden window and drives it with a click script
   (`tests/e2e_*.script`). The mouse is injected through raylib, so your
@@ -169,6 +170,10 @@ These were deliberately changed:
   choosing a source) is reverted on screen.
 * Duplicate discovery replies are merged. A streaming module that answers
   before its switcher is still paired with it.
+* **Sync time** is not part of `SWITCHER.exe`. It ports the frame of
+  DeviceWell's separate "Time synchronization V1.1.exe" (see
+  `PROTOCOL.md`). That tool broadcasts the frame to every switcher on
+  the LAN. This app sends it only to the switcher whose panel is open.
 * Standard window decorations replace the original frameless window with
   its custom title bar. The vendor's bitmap artwork is not used; buttons
   are drawn with text labels.
@@ -186,5 +191,6 @@ src/ui.[ch]         small immediate-mode widget kit on raylib
 src/screen_*.c      search, HDS7105 and HDS7106 windows
 src/testhook.[ch]   scripted input for the e2e tests (--script)
 tools/fakedev.py    device simulator
+tools/timesync.py   set switcher clocks from the command line (no GUI)
 tests/              unit test, e2e scripts and expectations
 ```

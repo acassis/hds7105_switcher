@@ -22,7 +22,7 @@ off  size  field
 0    1     0xA5          magic
 1    1     0x6C          magic
 2    2     total length, little endian (whole frame incl. magic and trailer)
-4    1     type          (device type: 0xA5 switcher; 0xE0/0xE5 "HIS" streaming module; 0x81 search)
+4    1     type          (device type: 0xA5 switcher; 0xE0/0xE5 "HIS" streaming module; 0x81 search / time sync)
 5    1     id            (device id; 0xFF in search/replies)
 6    1     0x01          (Set_ipCom: 0x00 if type==0xA5, 0x01 if type==0xE0, *absent* otherwise)
 7    9     0x00 ...      (replies carry info here, e.g. byte 14 = child type)
@@ -80,6 +80,49 @@ Receiver validates A5 6C / length / AE / checksum, then:
 * `(pkt[4]==0xE0 || pkt[4]==0xE5) && pkt[5]==0xFF` → HIS module; attached to the
   switcher whose Sign1..3 equal this packet's `pkt[L-6..L-4]`:
   `His_IP=sender`, `His_Type=pkt[4]`, `His_ID=pkt[5]`.
+
+## Time sync (not in `SWITCHER.exe`)
+
+DeviceWell sets the clock with a separate tool, *Time synchronization
+V1.1.exe* (MFC, Visual C++ 2010, no symbols, "Avmatrix Copyright (C)
+2019"; distributed by BZBGear with the PDF "Video Switcher Time
+Settings"). Its only visible control is **SYNC** (dialog 102, control
+1000). The MFC message map at 0x5544f0 sends that button to 0x4040d0,
+which does the following:
+
+1. Builds the frame with 0x401000, which reads `GetLocalTime()`, so the
+   PC's **local** time is sent.
+2. Opens a UDP socket (0x403cf0) with `SO_BROADCAST`, binds it to
+   0.0.0.0:7000 and makes it non-blocking.
+3. Sends the frame **once** to 255.255.255.255:7000.
+4. Calls `recvfrom` 50 times, 20 ms apart. Each valid `A5 6C … AE` reply
+   is added to its "Device List" tree. The rename table at 0x4043f7 holds
+   HDS9101, PVS0615, HDS6506A, HDS6506, PVS0605, HDS7106, VS0601,
+   HDS9106, PVS0613 and IAP.
+
+The frame is the discovery frame (type 0x81, id 0xFF, opcode 0xFF)
+followed by seven packed-BCD bytes. It is 27 bytes long:
+
+```
+A5 6C 1B 00 81 FF 01 00×9 | FF YY MM DD WD hh mm ss | sumL sumH AE
+YY = year % 100, WD = day of week (0 = Sunday, SYSTEMTIME.wDayOfWeek)
+```
+
+Example: Wed 2026-11-18 15:16:36 →
+`A5 6C 1B 00 81 FF 01 00 00 00 00 00 00 00 00 00 FF 26 11 18 03 15 16 36 5F 04 AE`.
+
+This frame was sent unicast from port 7000 to an HDS7105(2021) on
+2026-11-18. The switcher answered with its normal 41-byte discovery reply
+within 16 ms, and the user saw its date and time update. There is no
+separate acknowledgement, and the state reply (0x49) and the discovery
+reply contain no clock field. There is no known way to read the time
+back.
+
+The same executable also contains a network firmware upgrader. Its
+controls (x ≥ 130 dialog units) lie outside the main dialog's initial
+size (134 × 114). It has a "Pending File(Add or Drag in the
+file)" box, an Upgrade button, `.dwf` files, MCU and FPGA packets and
+error strings. That code was not analysed further.
 
 ## HDS7105 commands (`HDS7105_workdata`, sent to switcher IP, type/id from discovery)
 

@@ -86,7 +86,19 @@ answer as a streaming module.
 
 The current DeviceWell manual describes features the 2020 tool does not
 have: logo upload (BMP 256×128, 4 slots), time sync, and a web interface
-for streaming and recording. This app does not implement them either.
+for streaming and recording.
+
+* **Time sync is implemented in this app** (the **Sync time** button).
+  * The manual (chapter 10) says to use a separate DeviceWell "time
+    synchronization software".
+  * BZBGear distributes it as *Time synchronization V1.1.exe*, together
+    with a one-page PDF, "Video Switcher Time Settings".
+  * The tool sends one UDP frame: the discovery frame plus the PC's local
+    date and time (see `PROTOCOL.md`, *Time sync*). It was tested on the
+    HDS7105(2021).
+  * The switcher keeps the time but never reports it, so check it on the
+    switcher itself.
+* **Logo upload and the web interface are not implemented.**
 
 ## HDS7106
 
@@ -118,6 +130,11 @@ official product page.
   In". That is a UVC video device carrying the PGM picture (also visible to
   OBS), plus a HID interface. The HID interface is not used by
   `SWITCHER.exe`; control is over the network only.
+* **Default IP:** the time-sync tool's PDF gives 192.168.1.215 as the
+  default address. The tested unit was first at 192.168.1.7 and later
+  answered at 192.168.1.215.
+* **Clock:** the time-sync frame sets it, and the switcher answers with
+  its discovery reply. There is no known way to read the time back.
 * **Unsolicited frames:** the switcher sometimes sends 21-byte frames of
   its own, such as `81 00` (opcode, value) after a PVW command. These look
   like acknowledgements or change reports. The app does not use them yet.
@@ -129,6 +146,11 @@ official product page.
 * **The procedure is undocumented.** The manual says every HDS7 model
   supports "online upgrade" over the network port, but it describes no
   procedure.
+* **The time-sync tool contains an upgrader.** *Time synchronization
+  V1.1.exe* includes DeviceWell's network upgrader. Its controls lie
+  outside the window's initial size. It takes `.dwf` files and sends MCU and
+  FPGA images. No `.dwf` files are public, and the upgrader was not
+  analysed or used.
 * **The download area has no update files.** Searching DeviceWell's
   public download area for "upgrade", "firmware", "software" and "7105"
   finds only manuals and OBS instructions (checked 2026-11).
@@ -154,6 +176,9 @@ official product page.
   Production Switcher, 4 HDMI + 1 DP input, 1 HDMI PGM output, 1 HDMI
   multi-view output":
   <https://www.amazon.co.jp/-/en/Devicewell-HDS7105-Production-Switcher-Multi-view/dp/B08M8PCL9P>
+* **Time synchronization V1.1.exe and "Video Switcher Time Settings"
+  (PDF)**, as shared by BZBGear:
+  <https://bzbgear.com/knowledge-base/how-to-set-the-time-on-the-bg-mfvs-61/>
 * **Manual mirrors:**
   <https://www.manualslib.com/manual/1851713/Devicewell-Hds7105.html>,
   <https://manualshive.com/en/manual/devicewell/hds7105/2488807>

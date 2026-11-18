@@ -46,8 +46,11 @@ without hardware, run the simulator:
 * **HDS7106**: complete control panel (T-bar, PIP/POP, audio). The
   original tool never reads a 7106's state back, so neither does this one.
   Tested against the simulator only.
-* Not covered: features that newer DeviceWell software adds, such as logo
-  upload and time sync. `SWITCHER.exe` (October 2020) does not have them.
+* **Sync time** (both panels): sets the switcher's date and time to the
+  PC's local time. DeviceWell does this with a separate Windows tool;
+  its frame was recovered from that tool and checked on the HDS7105(2021).
+* Not covered: logo upload and other features of newer DeviceWell
+  software.
 
 ## Legal
 

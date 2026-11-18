@@ -9,6 +9,7 @@ vendor's Windows tool `SWITCHER.exe` and offers the same controls.
 * [3. Find and open a switcher](#3-find-and-open-a-switcher)
 * [4. HDS7105 control panel](#4-hds7105-control-panel)
 * [5. HDS7106 control panel](#5-hds7106-control-panel)
+* [Sync time: set the switcher's clock](#sync-time-set-the-switchers-clock)
 * [6. Command-line options](#6-command-line-options)
 * [7. Troubleshooting](#7-troubleshooting)
 
@@ -148,6 +149,9 @@ green.
 
 ### Settings
 
+**Sync time** (top right) sets the switcher's clock to the PC's time.
+See [Sync time](#sync-time-set-the-switchers-clock).
+
 The **Settings** button (top right) opens three sections.
 
 * **SWITCHER IP**: type a new address and press **Set IP**. The change is
@@ -191,6 +195,37 @@ start out blank.
 * **PIP / POP**: switches the inset window on and opens its settings on
   the right. For POP, choose **Window** 1 or 2 before moving it.
 * **Set IP** (top right): changes the switcher's address.
+* **Sync time** (top right): sets the switcher's clock. See below. Not
+  yet tested on a real HDS7106; the Windows tool lists the HDS7106 among
+  its models.
+
+## Sync time: set the switcher's clock
+
+Both control panels have a **Sync time** button in the title bar. It sets
+the switcher's date and time to this PC's **local** time. It does the same
+job as DeviceWell's Windows tool "Time synchronization", which the manual
+asks you to download.
+
+1. Check that the PC clock and time zone are right (`timedatectl`).
+2. Open the switcher's panel and press **Sync time**.
+3. Check the result:
+   * A message confirms that the switcher answered.
+   * The log shows `time sync: sent YYYY-MM-DD HH:MM:SS`.
+   * The switcher's own clock now shows the PC's time. The switcher
+     never sends its clock back, so this is the only way to see it.
+
+Notes:
+
+* **Time zone and DST.** The switcher stores the plain time with no time
+  zone. After a daylight-saving change, press **Sync time** again.
+* **Which switchers are set.** Only the switcher of the open panel is
+  set. The Windows tool sends to every switcher on the network. With
+  `--broadcast-control` the frame goes to the subnet broadcast address,
+  so every switcher on that subnet takes the time.
+* **No answer.** "No answer to the time sync" means nothing came back
+  within 3 s. Check the connection (§2), as for any other command.
+* **From a script or cron job**, without the GUI:
+  `python3 switcher/tools/timesync.py 192.168.1.215`.
 
 ## 6. Command-line options
 
@@ -218,6 +253,7 @@ received.
 | "No device found" | The switcher is on another subnet or behind a router, or a firewall drops the reply. Type its IP and press **Probe**. Check the firewall (§2). |
 | Listed, but the panel stays on "waiting for device state…" | Unicast does not reach the switcher. Typical causes: ARP blocked by router port isolation, or the switcher's subnet differs from the PC's. Use a direct cable or route (§2), or `--broadcast-control`. Check with `ping` and `ip neigh show <ip>` (`FAILED` means ARP fails). |
 | Status line says "UDP port 7000 is busy" | Another program, or a second copy of this app, is using port 7000. Replies to our own requests still work. Close the other program for normal operation. |
+| Switcher clock is wrong | Set the PC clock and time zone, then press **Sync time**. |
 | Panel does not match the hardware | Changes made on the switcher's own panel are not pushed to the PC. Press **DS / SYNC**. |
 | HIS / URL settings greyed out | No streaming module answered the search. Only models with a STREAM port (HDS7305) have one. |
 | After **Set IP** the switcher is gone | It now has an address your PC cannot reach. Change it back from the switcher's menu, or give the PC an address in the new subnet. |
