@@ -12,6 +12,8 @@ add_library(swcore STATIC
   src/proto.c
   src/net.c
   src/devices.c
-  src/session.c)
+  src/session.c
+  src/hds7105.c
+  src/hds7106.c)
 target_include_directories(swcore PUBLIC src)
 target_compile_options(swcore PRIVATE -Wall -Wextra -Wpedantic)
