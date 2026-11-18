@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 static int fails;
 
@@ -285,6 +286,36 @@ static void test_real_device(void)
     printf("ok   real HDS7105(2021) discovery + state frames\n");
 }
 
+/* Time sync (Time synchronization V1.1.exe @0x401000).  The first vector
+ * is the frame an HDS7105(2021) accepted on 2026-11-18 (the user saw its
+ * date and time update); the second checks BCD digits, Sunday = 0 and :60. */
+static void test_time(void)
+{
+    static const uint8_t real[] = {
+        0xA5, 0x6C, 0x1B, 0x00, 0x81, 0xFF, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0xFF, 0x26, 0x11, 0x18, 0x03, 0x15, 0x16, 0x36, 0x5F, 0x04, 0xAE };
+    static const uint8_t sun[] = {
+        0xA5, 0x6C, 0x1B, 0x00, 0x81, 0xFF, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        0xFF, 0x00, 0x01, 0x02, 0x00, 0x09, 0x08, 0x59, 0x19, 0x04, 0xAE };
+    struct tm t;
+    uint8_t f[32];
+    size_t n;
+
+    memset(&t, 0, sizeof t);              /* Wed 2026-11-18 15:16:36 */
+    t.tm_year = 126; t.tm_mon = 10; t.tm_mday = 18; t.tm_wday = 3;
+    t.tm_hour = 15; t.tm_min = 16; t.tm_sec = 36;
+    n = sw_build_time(f, &t);
+    expect_bytes("time sync 2026-11-18 Wed 15:16:36 (real device)", f, n,
+                 real, sizeof real);
+
+    memset(&t, 0, sizeof t);              /* Sun 2000-01-02 09:08:60 */
+    t.tm_year = 100; t.tm_mon = 0; t.tm_mday = 2; t.tm_wday = 0;
+    t.tm_hour = 9; t.tm_min = 8; t.tm_sec = 60;
+    n = sw_build_time(f, &t);
+    expect_bytes("time sync 2000-01-02 Sun 09:08:60 -> :59", f, n,
+                 sun, sizeof sun);
+}
+
 int main(void)
 {
     test_builders();
@@ -292,6 +323,7 @@ int main(void)
     test_discovery();
     test_status();
     test_real_device();
+    test_time();
     printf(fails ? "\n%d FAILURE(S)\n" : "\nall tests passed\n", fails);
     return fails ? 1 : 0;
 }

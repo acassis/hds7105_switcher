@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 /* SWITCHER_DATA::CalcCheckSum @0x8231c8 */
 uint16_t sw_checksum(const uint8_t *buf, size_t n)
@@ -78,6 +79,30 @@ size_t sw_build_search(uint8_t *out)
     uint8_t *p = put_header(out, 20, SW_TYPE_SEARCH, SW_ID_ANY);
     *p++ = 0xFF;
     return put_trailer(out, p, 20);
+}
+
+/* Two decimal digits as packed BCD (0..99). */
+static uint8_t bcd2(int v)
+{
+    v = ((v % 100) + 100) % 100;
+    return (uint8_t)((v / 10) << 4 | (v % 10));
+}
+
+/* "Time synchronization V1.1.exe" @0x401000, called from its SYNC handler
+ * @0x4040d0: GetLocalTime(), then type 81 / id FF / FF + 7 BCD bytes. */
+size_t sw_build_time(uint8_t *out, const struct tm *t)
+{
+    uint8_t *p = put_header(out, SW_TIME_FRAME_LEN, SW_TYPE_SEARCH, SW_ID_ANY);
+
+    *p++ = 0xFF;
+    *p++ = bcd2(t->tm_year + 1900);
+    *p++ = bcd2(t->tm_mon + 1);
+    *p++ = bcd2(t->tm_mday);
+    *p++ = bcd2(t->tm_wday);
+    *p++ = bcd2(t->tm_hour);
+    *p++ = bcd2(t->tm_min);
+    *p++ = bcd2(t->tm_sec > 59 ? 59 : t->tm_sec);   /* SYSTEMTIME has no :60 */
+    return put_trailer(out, p, SW_TIME_FRAME_LEN);
 }
 
 /* SWITCHER_DATA::Set_ipCom @0x82412c (len 0x20).

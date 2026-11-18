@@ -24,6 +24,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+struct tm;
+
 #define SW_PORT          7000
 #define SW_MAGIC0        0xA5
 #define SW_MAGIC1        0x6C
@@ -31,6 +33,7 @@
 #define SW_HDR_LEN       16       /* payload (opcode) starts here           */
 #define SW_MAX_FRAME     0x420    /* receive limit used by the original     */
 #define SW_URL_FRAME_LEN 809      /* CreateMcuUdpDataBuf_url                */
+#define SW_TIME_FRAME_LEN 27      /* "Time synchronization V1.1.exe" 0x401000 */
 
 /* Device types (frame byte 4) */
 #define SW_TYPE_SWITCHER 0xA5
@@ -68,6 +71,15 @@ size_t sw_build_dns(uint8_t *out, uint8_t type, uint8_t id,
 size_t sw_build_url(uint8_t *out, uint8_t type, uint8_t id, uint8_t index,
                     const char *name, size_t name_len,
                     const char *url, size_t url_len);
+
+/* Set the device clock.  Not in SWITCHER.exe: this is the frame of
+ * DeviceWell's separate "Time synchronization V1.1.exe".  It is the
+ * discovery frame (type 81, id FF, opcode FF) followed by the date and
+ * time as packed BCD: YY MM DD WD hh mm ss (YY = year % 100, WD = day of
+ * the week, 0 = Sunday, as in struct tm).  The switcher answers with its
+ * normal discovery reply.  `t` is taken as is; the original sends the PC's
+ * local time (GetLocalTime). */
+size_t sw_build_time(uint8_t *out, const struct tm *t);
 
 /* Receive side ------------------------------------------------------- */
 

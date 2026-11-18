@@ -63,3 +63,11 @@ int sw_tx_set_ip(sw_session_t *s, const uint8_t ip[4])
     size_t n = sw_build_ipcom(f, s->type, s->id, 0x05, ip, zero, zero);
     return sw_session_send(s, s->ip, f, n);
 }
+
+/* Time synchronization V1.1.exe broadcasts this to every device; here it
+ * goes to the open switcher only (or to the subnet with --broadcast-control). */
+int sw_tx_time(sw_session_t *s, const struct tm *t)
+{
+    uint8_t f[32];
+    return sw_session_send(s, s->ip, f, sw_build_time(f, t));
+}

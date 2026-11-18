@@ -8,6 +8,8 @@
 #include "net.h"
 #include "devices.h"
 
+struct tm;
+
 typedef struct {
     sw_net_t *net;
     uint32_t ip;                /* switcher, host order               */
@@ -32,5 +34,8 @@ int sw_tx_single(sw_session_t *s, uint8_t op, uint8_t v);
 int sw_tx_double(sw_session_t *s, uint8_t op, uint8_t a, uint8_t b);
 int sw_tx_u16(sw_session_t *s, uint8_t op, uint16_t v);   /* lo, hi */
 int sw_tx_set_ip(sw_session_t *s, const uint8_t ip[4]);   /* op 05, mask/gw 0 */
+
+/* Set the switcher's clock to `t` (sw_build_time; type 81, not s->type). */
+int sw_tx_time(sw_session_t *s, const struct tm *t);
 
 #endif
