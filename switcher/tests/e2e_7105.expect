@@ -1,0 +1,44 @@
+# Frames the fake device must receive for e2e_7105.script, in order.
+# "<to> <opcode> [args...]": SW = switcher socket, HIS = streaming module.
+SW FF              # discovery (type 0x81) via --probe
+SW 49              # panel opens: read full state
+SW 80 03           # PGM 3
+SW 81 04           # PVW 4
+SW 83              # CUT
+SW 84              # AUTO
+SW B1 02           # RATE 3
+SW 8E              # FADE
+SW 8F              # UP = SET_WIPE ...
+SW 92 25           # ... + wipe style 0x25
+SW 8F              # LEFT
+SW 92 23
+SW 8F              # RIGHT
+SW 92 27
+SW 8F              # DOWN
+SW 92 29
+SW 8D              # MIX transition
+SW CC              # AFV button
+SW CB              # MIX button
+SW B9 04           # CH1 source = IN2 (device code 4)
+SW CE 37           # CH1 volume 50 -> 55
+SW D0              # F2
+SW D4              # F3
+SW D6              # F7
+SW 85              # FTB
+SW 49              # DS
+SW A3 0B           # F1: PGM Out = 1080P50
+SW CD              # STILL
+SW 86 01           # PIP on
+SW A2 02           # PIP size Large
+SW A0 0A 00        # PIP H = 10
+SW A0 14 00        # PIP H = 20
+SW 9F 03           # PIP border width 3
+SW 86 00           # PIP off
+HIS 24             # read streaming module IP info
+HIS 23 08 08 08 08 02 50 3B 8C   # set DNS 8.8.8.8 (+ constant tail)
+HIS 6A 00          # read URL index 0 (shown as "1")
+HIS 67 00 00 04    # set URL: 67 00 idx=0 name_len=4 ("main")
+SW 49              # DS
+SW FF              # RETURN: back to search, rescan (unicast probe)
+SW FF              # Probe button
+SW 49              # Connect by IP: panel opens and reads state

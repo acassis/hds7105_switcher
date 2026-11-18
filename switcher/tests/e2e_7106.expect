@@ -1,0 +1,81 @@
+# Frames the fake HDS7106 must receive for e2e_7106.script, in order.
+SW FF              # discovery via --probe (opening a 7106 sends nothing)
+SW 80 02           # PGM 2
+SW 81 05           # PVW 5
+SW 83              # CUT
+SW 84              # AUTO
+SW 8D              # MIX transition
+SW 8E              # FADE
+SW 8F              # UP
+SW 92 25
+SW 8F              # DOWN
+SW 92 29
+SW 8F              # LEFT
+SW 92 23
+SW 8F              # RIGHT
+SW 92 27
+SW CC              # AFV button
+SW CB              # MIX button
+SW B9 03           # CH1 source IN1 = CH_NB[2] = 3   (volume warning sent nothing)
+SW B8 03 46        # CH1 volume 70, keyed by source code 3
+SW A3 09           # PGM Out 1080I60
+SW 86 01           # PIP on
+SW A2 01           # PIP size Medium
+SW A0 0A 00        # PIP H 10
+SW 9E 02           # PIP border color Blue
+SW A7 01           # POP on (PIP is not switched off on the device)
+SW A8 01           # POP window 1   (H before window: warning, nothing sent)
+SW AC 0A 00        # POP H 10
+SW A9 01           # POP border on
+SW AB 03           # POP border width 3
+SW AA 03           # POP border color Green
+SW A7 00           # POP off
+SW 82 00           # T-bar up stroke
+SW 82 00           # T-bar up stroke
+SW 82 00           # T-bar up stroke
+SW 82 00           # T-bar up stroke
+SW 82 00           # T-bar up stroke
+SW 82 00           # T-bar up stroke
+SW 82 00           # T-bar up stroke
+SW 82 00           # T-bar up stroke
+SW 82 00           # T-bar up stroke
+SW 82 00           # T-bar up stroke
+SW 82 00           # T-bar up stroke
+SW 82 00           # T-bar up stroke
+SW 82 00           # T-bar up stroke
+SW 82 00           # T-bar up stroke
+SW 82 00           # T-bar up stroke
+SW 82 00           # T-bar up stroke
+SW 82 00           # T-bar up stroke
+SW 82 00           # T-bar up stroke
+SW 82 00           # T-bar up stroke
+SW 82 00           # T-bar up stroke
+SW 82 00           # T-bar up stroke
+SW 82 00           # T-bar up stroke
+SW 82 00           # T-bar up stroke
+SW 82 01 00        # top reached: direction flips
+SW 82 01           # T-bar down stroke
+SW 82 01           # T-bar down stroke
+SW 82 01           # T-bar down stroke
+SW 82 01           # T-bar down stroke
+SW 82 01           # T-bar down stroke
+SW 82 01           # T-bar down stroke
+SW 82 01           # T-bar down stroke
+SW 82 01           # T-bar down stroke
+SW 82 01           # T-bar down stroke
+SW 82 01           # T-bar down stroke
+SW 82 01           # T-bar down stroke
+SW 82 01           # T-bar down stroke
+SW 82 01           # T-bar down stroke
+SW 82 01           # T-bar down stroke
+SW 82 01           # T-bar down stroke
+SW 82 01           # T-bar down stroke
+SW 82 01           # T-bar down stroke
+SW 82 01           # T-bar down stroke
+SW 82 01           # T-bar down stroke
+SW 82 01           # T-bar down stroke
+SW 82 01           # T-bar down stroke
+SW 82 01           # T-bar down stroke
+SW 82 01           # T-bar down stroke
+SW 82 01 7E        # bottom reached
+SW 05 7F 00 00 02  # Set IP 127.0.0.2 (Set_ipCom, mask/gw 0)

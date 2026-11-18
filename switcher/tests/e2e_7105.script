@@ -1,0 +1,83 @@
+# UI script for tests/e2e.sh: drive every HDS7105 control once.
+# Coordinates are window pixels of the 1000x640 HDS7105 panel.
+# @OUT@ is replaced by the output directory.
+wait 40
+# search list: double-click the first device
+click 230 82
+click 230 82
+wait 30
+shot @OUT@/h5_initial.png
+# PGM 3, PVW 4, CUT, AUTO (900 ms), RATE 3
+click 210 464
+click 694 464
+click 873 439
+click 947 439
+wait 70
+click 958 515
+# transitions: FADE, UP, LEFT, RIGHT, DOWN, MIX
+click 500 302
+click 660 222
+click 594 280
+click 726 280
+click 660 338
+click 500 222
+# audio: AFV, MIX, CH1 -> IN2, CH1 volume +5
+click 60 222
+click 60 302
+click 194 231
+click 194 321
+click 407 231
+# F2, F3, F7, FTB, DS
+click 218 91
+click 292 91
+click 588 91
+click 748 91
+click 832 91
+# F1 dialog: PGM Out -> 1080P50, close
+click 144 91
+wait 5
+click 540 310
+click 540 370
+shot @OUT@/h5_f1.png
+click 587 372
+# STILL, then PIP on (opens the PIP panel)
+click 933 225
+click 847 225
+wait 10
+# PIP panel (x 1000..1220): size Large, H +10 twice, border width +1
+click 1110 275
+click 1110 365
+click 1189 131
+click 1189 131
+click 1189 419
+wait 5
+shot @OUT@/h5_pip.png
+# PIP off
+click 847 225
+wait 10
+# Settings dialog: Read HIS status, Set DNS, Read URL, Set URL, close
+click 934 21
+wait 5
+click 762 344
+wait 20
+click 606 344
+click 762 506
+wait 20
+shot @OUT@/h5_settings.png
+click 326 506
+click 782 542
+wait 5
+# DS once more so the final state is read back
+click 832 91
+wait 20
+shot @OUT@/h5_final.png
+# RETURN -> search (rescan), Probe, then Connect by IP (no discovery)
+click 54 91
+wait 20
+shot @OUT@/search_again.png
+click 240 414
+wait 10
+click 460 414
+wait 20
+shot @OUT@/h5_reopened.png
+quit

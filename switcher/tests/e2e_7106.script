@@ -1,0 +1,73 @@
+# UI script for tests/e2e.sh: drive the HDS7106 panel (1000x640,
+# 1280x640 while the PIP/POP panel is open).  @OUT@ = output directory.
+wait 40
+click 230 82
+click 230 82
+wait 20
+# PGM 2, PVW 5, CUT, AUTO
+click 194 368
+click 554 500
+click 928 476
+click 928 336
+wait 70
+# transitions MIX FADE UP DOWN LEFT RIGHT
+click 511 127
+click 511 213
+click 599 127
+click 599 213
+click 681 127
+click 681 213
+# AFV, MIX
+click 139 127
+click 139 213
+# CH1 volume without a source -> warning, dismiss with OK
+click 420 124
+wait 3
+shot @OUT@/h6_warning.png
+click 649 385
+# CH1 source IN1, then CH1 volume +10
+click 248 124
+click 248 208
+click 420 124
+# PGM Out 1080I60
+click 378 246
+click 378 330
+# PIP on; size Medium, H +10, border color Blue
+click 805 157
+wait 5
+click 1198 307
+click 1198 367
+click 1241 219
+click 1198 439
+click 1198 529
+shot @OUT@/h6_pip.png
+# POP on; H before choosing a window -> warning; window 1; H +10;
+# border on; width +1; color Green
+click 925 157
+wait 5
+click 1241 219
+wait 3
+click 789 385
+click 1198 175
+click 1241 219
+click 1198 351
+click 1241 395
+click 1198 439
+click 1198 559
+shot @OUT@/h6_pop.png
+# POP off
+click 925 157
+wait 5
+# T-bar: full up stroke, then full down stroke
+drag 810 556 810 230
+wait 5
+shot @OUT@/h6_tbar_top.png
+drag 810 230 810 556
+wait 5
+# Set IP dialog -> ok (same address)
+click 934 21
+wait 3
+click 609 367
+wait 5
+shot @OUT@/h6_final.png
+quit
