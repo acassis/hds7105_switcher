@@ -122,6 +122,24 @@ official product page.
   its own, such as `81 00` (opcode, value) after a PVW command. These look
   like acknowledgements or change reports. The app does not use them yet.
 
+## Firmware updates
+
+* **SWITCHER.exe cannot update firmware.** No upgrade code, UI text or
+  opcode exists in its symbols, its strings or its opcode enum.
+* **The procedure is undocumented.** The manual says every HDS7 model
+  supports "online upgrade" over the network port, but it describes no
+  procedure.
+* **The download area has no update files.** Searching DeviceWell's
+  public download area for "upgrade", "firmware", "software" and "7105"
+  finds only manuals and OBS instructions (checked 2026-11).
+* **Get updates from DeviceWell support** at <support@devicewell.cn>.
+  Give them the exact model shown by the search window, for example
+  `HDS7105(2021)`, and the serial number from the switcher's menu (MENU →
+  Device information).
+* **Check the model before flashing.** HDS7105, HDS7105S, HDS7105P and
+  the 2021 revision are different hardware. Flashing the wrong image can
+  leave the unit unusable.
+
 ## Sources
 
 * **DeviceWell HDS7105/7105S/7105P/7305 user manual V1.5:**
