@@ -33,7 +33,18 @@ target_include_directories(swui PUBLIC src)
 target_link_libraries(swui PUBLIC raylib)
 target_compile_options(swui PRIVATE -Wall -Wextra)
 
+add_executable(switcher
+  src/main.c
+  src/testhook.c
+  src/screen_search.c
+  src/screen_7105.c
+  src/screen_7106.c)
+target_link_libraries(switcher PRIVATE swcore swui raylib m)
+target_compile_options(switcher PRIVATE -Wall -Wextra)
+
 enable_testing()
 add_executable(test_proto tests/test_proto.c)
 target_link_libraries(test_proto PRIVATE swcore)
 add_test(NAME proto COMMAND test_proto)
+
+install(TARGETS switcher RUNTIME DESTINATION bin)
