@@ -13,6 +13,7 @@ share UDP port 7000 with the client on the same machine.  --broadcast
 additionally answers broadcast searches (binds 255.255.255.255:7000).
 """
 import argparse
+import datetime
 import json
 import select
 import socket
@@ -60,6 +61,25 @@ def frames_in(data):
         i += 1
 
 
+def bcd(b):
+    return (b >> 4) * 10 + (b & 15)
+
+
+def decode_time(f):
+    """27-byte time-sync frame (81 FF, FF + YY MM DD WD hh mm ss in BCD):
+    return (text, ok) where ok means valid BCD within 5 s of our clock."""
+    yy, mo, dd, wd, hh, mi, ss = f[17:24]
+    if any((b & 15) > 9 or (b >> 4) > 9 for b in f[17:24]):
+        return "bad BCD " + f[17:24].hex(" "), False
+    try:
+        t = datetime.datetime(2000 + bcd(yy), bcd(mo), bcd(dd), bcd(hh), bcd(mi), bcd(ss))
+    except ValueError:
+        return "bad date " + f[17:24].hex(" "), False
+    ok = (t.weekday() + 1) % 7 == bcd(wd) and \
+        abs((datetime.datetime.now() - t).total_seconds()) < 5
+    return t.strftime("%Y-%m-%d %a %H:%M:%S"), ok
+
+
 def ip4(s):
     return bytes(int(x) for x in s.split("."))
 
@@ -87,8 +107,14 @@ class Device:
         entry = dict(t=round(time.time(), 3), to=who, src="%s:%d" % src,
                      type=f[4], op=op, name=NAMES.get(op, "?"), args=args[:8],
                      len=len(f), hex=f.hex(" "))
-        print("%-4s %-15s %-16s args=%s" % (who, entry["src"], entry["name"],
-                                            " ".join("%02X" % x for x in args[:8])),
+        extra = ""
+        if f[4] == 0x81 and len(f) == 27:
+            entry["name"] = "TIME_SYNC"
+            entry["time"], entry["time_ok"] = decode_time(f)
+            extra = "  -> %s%s" % (entry["time"], "" if entry["time_ok"] else " (WRONG)")
+        print("%-4s %-15s %-16s args=%s%s" % (who, entry["src"], entry["name"],
+                                              " ".join("%02X" % x for x in args[:8]),
+                                              extra),
               flush=True)
         if self.rec:
             self.rec.write(json.dumps(entry) + "\n")
@@ -200,7 +226,7 @@ def main():
             for f in frames_in(data):
                 who = "SW" if s is sw else "HIS" if s is his else "BC"
                 dev.log(who, f, src)
-                if f[4] == 0x81:                       # discovery
+                if f[4] == 0x81:                       # discovery / time sync
                     sw.sendto(frame(0xA5, b"\xff" + dev.sign, dev.model), src)
                     if his:
                         his.sendto(frame(0xE0, b"\xff" + dev.sign), src)

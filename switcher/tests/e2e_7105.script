@@ -71,6 +71,10 @@ wait 5
 click 832 91
 wait 20
 shot @OUT@/h5_final.png
+# Sync time (header button): PC clock -> switcher; toast on the reply
+click 814 21
+wait 10
+shot @OUT@/h5_timesync.png
 # RETURN -> search (rescan), Probe, then Connect by IP (no discovery)
 click 54 91
 wait 20

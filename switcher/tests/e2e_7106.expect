@@ -78,4 +78,5 @@ SW 82 01           # T-bar down stroke
 SW 82 01           # T-bar down stroke
 SW 82 01           # T-bar down stroke
 SW 82 01 7E        # bottom reached
+SW FF @time        # Sync time: 27-byte frame, BCD = simulator's clock
 SW 05 7F 00 00 02  # Set IP 127.0.0.2 (Set_ipCom, mask/gw 0)

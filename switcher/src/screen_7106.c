@@ -320,6 +320,7 @@ void h6_screen_draw(void)
         snprintf(S.ip_text, sizeof S.ip_text, "%s", ip);
         S.dlg_ip = true;
     }
+    app_draw_time_button((float)GetScreenWidth() - 240, 6);
 
     if (ui_tally((Rectangle){ 20, 52, 58, 58 }, "<", "RETURN", false, TONE_NONE, true))
         app_back_to_search();

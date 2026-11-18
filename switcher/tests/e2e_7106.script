@@ -64,6 +64,10 @@ wait 5
 shot @OUT@/h6_tbar_top.png
 drag 810 230 810 556
 wait 5
+# Sync time (header button)
+click 814 21
+wait 10
+shot @OUT@/h6_timesync.png
 # Set IP dialog -> ok (same address)
 click 934 21
 wait 3

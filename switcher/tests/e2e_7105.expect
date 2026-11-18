@@ -39,6 +39,7 @@ HIS 23 08 08 08 08 02 50 3B 8C   # set DNS 8.8.8.8 (+ constant tail)
 HIS 6A 00          # read URL index 0 (shown as "1")
 HIS 67 00 00 04    # set URL: 67 00 idx=0 name_len=4 ("main")
 SW 49              # DS
+SW FF @time        # Sync time: 27-byte frame, BCD = simulator's clock
 SW FF              # RETURN: back to search, rescan (unicast probe)
 SW FF              # Probe button
 SW 49              # Connect by IP: panel opens and reads state

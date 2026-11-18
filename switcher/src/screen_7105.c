@@ -562,6 +562,7 @@ void h5_screen_draw(void)
     if (ui_button((Rectangle){ (float)GetScreenWidth() - 120, 6, 108, 30 },
                   "Settings", true))
         S.dlg = DLG_SETTINGS;
+    app_draw_time_button((float)GetScreenWidth() - 240, 6);
 
     draw_upper(48);
     draw_below(394);

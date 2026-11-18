@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 app_t g_app;
 
@@ -97,10 +98,42 @@ void app_open_device(const sw_device_t *d)
 void app_back_to_search(void)
 {
     g_app.screen = SCREEN_SEARCH;
+    g_app.time_sent_at = 0;          /* search replies are not answers */
     app_search();
 }
 
+/* Set the switcher's clock to this PC's local time, as DeviceWell's
+ * "Time synchronization" tool does.  The switcher answers with its
+ * discovery reply (see on_frame). */
+void app_sync_time(void)
+{
+    time_t now = time(NULL);
+    struct tm t;
+    char ts[32], ip[16];
+
+    localtime_r(&now, &t);
+    strftime(ts, sizeof ts, "%Y-%m-%d %H:%M:%S", &t);
+    sw_ip_str(g_app.sess.ip, ip);
+    if (sw_tx_time(&g_app.sess, &t) < 0) {
+        ui_message("Sync time", "Could not send the time to %s", ip);
+        return;
+    }
+    g_app.time_sent_at = GetTime();
+    snprintf(g_app.time_sent, sizeof g_app.time_sent, "%s", ts);
+    app_log("time sync: sent %s (local time) to %s", ts, ip);
+    ui_toast("Time %s sent to %s", ts, ip);
+}
+
 /* ------------------------------------------------------------------ */
+
+void app_draw_time_button(float x, float y)
+{
+    Rectangle r = { x, y, 108, 30 };
+
+    if (ui_button(r, "Sync time", true))
+        app_sync_time();
+    ui_tooltip(r, "Set the switcher's date and time to this PC's local time");
+}
 
 void app_draw_header(const char *title, const char *subtitle)
 {
@@ -160,6 +193,13 @@ static void on_frame(void *user, uint32_t ip, uint16_t port, bool discovery,
 {
     (void)user;
     (void)port;
+    /* A time-sync frame is answered with the discovery reply. */
+    if (g_app.time_sent_at > 0 && ip == g_app.sess.ip && n > SW_HDR_LEN &&
+        f[4] == SW_TYPE_SWITCHER && f[SW_HDR_LEN] == 0xFF) {
+        g_app.time_sent_at = 0;
+        app_log("time sync: switcher answered");
+        ui_toast("Time %s sent; the switcher answered", g_app.time_sent);
+    }
     /* The original parsed discovery replies only on its (ephemeral-port)
      * search socket and state replies only on the :7000 socket.  Accept a
      * discovery reply on :7000 too, as long as it is not a state reply. */
@@ -265,6 +305,11 @@ int main(int argc, char **argv)
         if (g_app.resend_at && GetTime() >= g_app.resend_at) {
             sw_net_search_broadcast(&g_app.net);
             g_app.resend_at = 0;
+        }
+        if (g_app.time_sent_at > 0 && GetTime() - g_app.time_sent_at > 3.0) {
+            g_app.time_sent_at = 0;
+            app_log("time sync: no answer within 3 s");
+            ui_toast("No answer to the time sync; check the connection (Log)");
         }
         if (g_app.screen == SCREEN_7105) h5_screen_tick();
         if (g_app.screen == SCREEN_7106) h6_screen_tick();
